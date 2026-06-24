@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Leveleads — You're Booked In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;0,600;0,700;0,800;0,900;1,800;1,900&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --blue: #1f5bff;
+    --blue-light: #4d9bff;
+    --green: #2fb24a;
+    --green-light: #4fd06e;
+    --bg: #000000;
+    --text: #ffffff;
+    --muted: #9aa3b2;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { min-height: 100%; }
+
+  body {
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 34px 24px 60px;
+    text-align: center;
+  }
+
+  /* Logo + divider */
+  .logo {
+    width: 92px;
+    height: 92px;
+    border-radius: 18px;
+    background: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.6);
+    overflow: hidden;
+  }
+  .logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+  .divider {
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.22) 50%, rgba(255,255,255,0) 100%);
+    margin: 26px 0 40px;
+  }
+
+  /* Headline */
+  h1 {
+    font-size: clamp(28px, 4.6vw, 56px);
+    line-height: 1.1;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    max-width: 22ch;
+    margin: 0 auto;
+  }
+  h1 .play-ico {
+    display: inline-block;
+    vertical-align: -0.14em;
+    width: clamp(28px, 4vw, 48px);
+    height: clamp(28px, 4vw, 48px);
+    margin-right: 14px;
+  }
+  h1 .blue { color: var(--blue-light); font-style: italic; }
+  h1 .green { color: var(--green-light); font-style: italic; }
+
+  /* Click Play pill */
+  .play-label {
+    display: inline-block;
+    margin: 34px auto 30px;
+    padding: 18px 38px;
+    border-radius: 100px;
+    background: #050505;
+    border: 2px solid var(--blue);
+    box-shadow: 0 0 26px rgba(31,91,255,0.55), inset 0 0 14px rgba(31,91,255,0.18);
+    font-size: clamp(16px, 2.2vw, 24px);
+    font-weight: 700;
+    color: #fff;
+  }
+
+  /* Video */
+  .video-frame {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    aspect-ratio: 16 / 9;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #0a0a0a;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .video-frame .placeholder {
+    position: absolute;
+    inset: 0;
+    background: #000000;
+  }
+  .big-play {
+    width: clamp(78px, 11vw, 132px);
+    height: clamp(78px, 11vw, 132px);
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--green));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 16px 50px rgba(31,91,255,0.5);
+    transition: transform .2s ease;
+  }
+  .video-frame:hover .big-play { transform: scale(1.06); }
+  .big-play svg { width: 38%; height: 38%; margin-left: 8%; }
+  .video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+  /* ---- Custom VSL player (no seek/forward) ---- */
+  .video-frame video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
+  .vsl-overlay {
+    position: absolute; inset: 0; z-index: 2;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .vsl-overlay img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .vsl-overlay .big-play { cursor: pointer; position: relative; z-index: 1; }
+  .vsl-controls {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 3;
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.78) 100%);
+    opacity: 0; transition: opacity .2s ease;
+  }
+  .video-frame:hover .vsl-controls,
+  .video-frame.paused .vsl-controls { opacity: 1; }
+  .vsl-btn {
+    background: none; border: none; padding: 0; margin: 0;
+    color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    flex: 0 0 auto;
+  }
+  .vsl-btn svg { width: 22px; height: 22px; display: block; }
+  /* Non-interactive progress (display only — cannot click to seek) */
+  .vsl-bar {
+    position: relative; flex: 1 1 auto; height: 5px;
+    background: rgba(255,255,255,0.25); border-radius: 4px; overflow: hidden;
+    pointer-events: none;
+  }
+  .vsl-bar-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0%;
+    background: linear-gradient(90deg, var(--blue), var(--green)); }
+  .vsl-time { display: none; } /* hidden so the VSL-style progress bar isn't contradicted */
+  .vsl-vol {
+    flex: 0 0 auto; width: 78px; height: 4px; -webkit-appearance: none; appearance: none;
+    background: rgba(255,255,255,0.3); border-radius: 4px; cursor: pointer;
+  }
+  .vsl-vol::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; border-radius: 50%; background: #fff; cursor: pointer; }
+  .vsl-vol::-moz-range-thumb { width: 13px; height: 13px; border: none; border-radius: 50%; background: #fff; cursor: pointer; }
+  @media (max-width: 620px) { .vsl-vol { width: 52px; } .vsl-time { display: none; } }
+
+  /* What happens next */
+  .next { margin: 64px auto 0; max-width: 1000px; }
+  .next-title {
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 22px;
+  }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .step {
+    background: #0c0c0e;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 26px 22px;
+    text-align: left;
+  }
+  .step .num {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: rgba(31,91,255,0.16);
+    color: var(--blue-light);
+    font-weight: 800;
+    font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 14px;
+  }
+  .step .t { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 5px; }
+  .step .d { font-size: 13.5px; color: var(--muted); line-height: 1.5; font-weight: 500; }
+
+  /* Quick video FAQ */
+  .faq { margin: 70px auto 0; max-width: 1000px; }
+  .faq-title {
+    font-size: clamp(22px, 3vw, 34px);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+  }
+  .faq-title .blue { color: var(--blue-light); }
+  .faq-sub {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 30px;
+  }
+  .faq-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px 18px;
+  }
+  .faq-item {
+    text-align: left;
+    background: #0a0e1a;
+    border: 1px solid rgba(77,155,255,0.28);
+    border-radius: 16px;
+    padding: 14px 14px 18px;
+    transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease;
+  }
+  .faq-item:hover {
+    border-color: rgba(77,155,255,0.7);
+    transform: translateY(-3px);
+    box-shadow: 0 14px 34px rgba(31,91,255,0.18);
+  }
+  .faq-video {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #000000;
+    border: 1px solid rgba(255,255,255,0.07);
+    cursor: pointer;
+  }
+  .faq-video .mini-play {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--green));
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 24px rgba(31,91,255,0.45);
+    transition: transform .2s ease;
+  }
+  .faq-video:hover .mini-play { transform: translate(-50%, -50%) scale(1.08); }
+  .faq-video .mini-play svg { width: 18px; height: 18px; margin-left: 3px; }
+  .faq-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .faq-video video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #000; }
+  /* In fullscreen, show the whole frame (no cropping) */
+  .faq-video video:fullscreen { object-fit: contain; }
+  .faq-video video:-webkit-full-screen { object-fit: contain; }
+  /* Custom poster overlay — persists as the resting state */
+  .faq-video .poster-ov {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+  }
+  .faq-video .poster-ov img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .faq-video .poster-ov .mini-play {
+    position: relative;
+    z-index: 1;
+  }
+  .faq-q {
+    display: flex;
+    gap: 9px;
+    margin-top: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.35;
+  }
+  .faq-q .qn {
+    flex: 0 0 auto;
+    color: var(--blue-light);
+    font-weight: 800;
+  }
+
+  .bottom-bar {
+    width: 200px;
+    height: 4px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--blue), var(--green));
+    margin: 60px auto 0;
+  }
+
+  footer {
+    text-align: center;
+    padding: 30px 24px 0;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  @media (max-width: 900px) {
+    .faq-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 620px) {
+    .steps { grid-template-columns: 1fr; }
+    .faq-grid { grid-template-columns: 1fr; }
+    h1 .play-ico { margin-right: 8px; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- Logo -->
+    <div class="logo" aria-label="Leveleads">
+      <img src="logo.png" alt="Leveleads" />
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Headline (play icon inline, like reference) -->
+    <h1>
+      <svg class="play-ico" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="pg" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#1f5bff"/><stop offset="1" stop-color="#2fb24a"/>
+          </linearGradient>
+        </defs>
+        <circle cx="50" cy="50" r="50" fill="url(#pg)"/>
+        <path d="M40 32l28 18-28 18V32z" fill="#fff"/>
+      </svg>Everything You Should Know <span class="blue">Before</span> Getting Your Own <span class="green">AI Receptionist…</span>
+    </h1>
+
+    <!-- Click Play pill -->
+    <div class="play-label">Click Play To Watch The Quick Welcome Video:</div>
+
+    <div class="video-frame paused" id="vslFrame">
+      <video id="vsl" src="https://github.com/leveleadshere-del/Funnel1/releases/download/media-v1/main-vsl.mp4" poster="videos/main-vsl.png" preload="metadata" playsinline
+             disablepictureinpicture controlslist="nodownload noplaybackrate noremoteplayback"></video>
+
+      <!-- Big play overlay + thumbnail (resting state) -->
+      <div class="vsl-overlay" id="vslOverlay">
+        <img src="videos/main-vsl.png" alt="This is what will happen in the call">
+        <div class="big-play"><svg viewBox="0 0 24 24" fill="none"><path d="M7 5l12 7-12 7V5z" fill="#fff"/></svg></div>
+      </div>
+
+      <!-- Custom controls: play/pause, (non-seekable) progress, time, volume, fullscreen -->
+      <div class="vsl-controls">
+        <button class="vsl-btn" id="vslPlayBtn" aria-label="Play/Pause">
+          <svg id="vslPlayIcon" viewBox="0 0 24 24" fill="none"><path d="M7 5l12 7-12 7V5z" fill="#fff"/></svg>
+          <svg id="vslPauseIcon" viewBox="0 0 24 24" fill="none" style="display:none"><path d="M7 5h3v14H7zM14 5h3v14h-3z" fill="#fff"/></svg>
+        </button>
+        <div class="vsl-bar"><div class="vsl-bar-fill" id="vslFill"></div></div>
+        <span class="vsl-time" id="vslTime">0:00 / 0:00</span>
+        <button class="vsl-btn" id="vslMuteBtn" aria-label="Mute">
+          <svg id="vslVolIcon" viewBox="0 0 24 24" fill="none"><path d="M5 9v6h4l5 4V5L9 9H5z" fill="#fff"/><path d="M16.5 8.5a5 5 0 010 7M19 6a8 8 0 010 12" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <svg id="vslMuteIcon" viewBox="0 0 24 24" fill="none" style="display:none"><path d="M5 9v6h4l5 4V5L9 9H5z" fill="#fff"/><path d="M17 9l5 6M22 9l-5 6" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+        <input type="range" class="vsl-vol" id="vslVol" min="0" max="1" step="0.05" value="1" aria-label="Volume">
+        <button class="vsl-btn" id="vslFsBtn" aria-label="Fullscreen">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick video FAQ -->
+    <div class="faq">
+      <p class="faq-title">Still Got A Question? <span class="blue">Watch The Quick Answer</span></p>
+      <p class="faq-sub">The 6 things installers ask me most — answered in under a minute each.</p>
+
+      <div class="faq-grid">
+
+        <div class="faq-item">
+          <div class="faq-video"><video src="https://github.com/leveleadshere-del/Funnel1/releases/download/media-v1/faq5.mp4" poster="videos/faq5.png" controls preload="metadata" playsinline></video></div>
+          <p class="faq-q"><span class="qn">1.</span> "Okay… so how much does this actually cost?"</p>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-video"><video src="videos/faq2.mp4" poster="videos/faq2.png" controls preload="metadata" playsinline></video></div>
+          <p class="faq-q"><span class="qn">2.</span> "Can an AI really talk to my customers? Won't it sound like a robot?"</p>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-video"><video src="videos/faq3.mp4" poster="videos/faq3.png" controls preload="metadata" playsinline></video></div>
+          <p class="faq-q"><span class="qn">3.</span> "I miss calls, but people just call back later."</p>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-video"><video src="videos/faq4.mp4" poster="videos/faq4.png" controls preload="metadata" playsinline></video></div>
+          <p class="faq-q"><span class="qn">4.</span> "This sounds complicated — I'm not a tech person."</p>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-video"><video src="videos/faq1.mp4" poster="videos/faq1.png" controls preload="metadata" playsinline></video></div>
+          <p class="faq-q"><span class="qn">5.</span> "I'm on jobs all day — I don't have time for a call."</p>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-video"><video src="videos/faq6.mp4" poster="videos/faq6.png" controls preload="metadata" playsinline></video></div>
+          <p class="faq-q"><span class="qn">6.</span> "How do I know this works for my business?"</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- What happens next -->
+    <div class="next">
+      <p class="next-title">What Happens Next</p>
+      <div class="steps">
+        <div class="step">
+          <div class="num">1</div>
+          <div class="t">Check your email</div>
+          <div class="d">Your booking confirmation and call details are on their way to your inbox.</div>
+        </div>
+        <div class="step">
+          <div class="num">2</div>
+          <div class="t">Add it to your calendar</div>
+          <div class="d">Pop the call in your diary so it doesn't get lost in a busy install week.</div>
+        </div>
+        <div class="step">
+          <div class="num">3</div>
+          <div class="t">Show up &amp; press play</div>
+          <div class="d">We'll map out your AI voice agent together — no pressure, no jargon.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-bar"></div>
+
+    <footer>© 2026 Leveleads — All rights reserved.</footer>
+  </div>
+
+  <script>
+    // ---- Custom VSL player: play/pause, volume, fullscreen — NO seeking/forwarding ----
+    (function () {
+      var frame   = document.getElementById('vslFrame');
+      var video   = document.getElementById('vsl');
+      if (!frame || !video) return;
+
+      var overlay  = document.getElementById('vslOverlay');
+      var playBtn  = document.getElementById('vslPlayBtn');
+      var playIcon = document.getElementById('vslPlayIcon');
+      var pauseIcon= document.getElementById('vslPauseIcon');
+      var fill     = document.getElementById('vslFill');
+      var timeEl   = document.getElementById('vslTime');
+      var muteBtn  = document.getElementById('vslMuteBtn');
+      var volIcon  = document.getElementById('vslVolIcon');
+      var muteIcon = document.getElementById('vslMuteIcon');
+      var volSlider= document.getElementById('vslVol');
+      var fsBtn    = document.getElementById('vslFsBtn');
+
+      var maxWatched = 0;          // furthest point actually watched
+      var SEEK_TOLERANCE = 0.5;    // seconds of slack
+
+      // VSL-style progress bar: sprints ahead early, then crawls.
+      var FAST_DUR    = 18;        // first 18s of the video...
+      var FAST_TARGET = 0.40;      // ...fills the bar to 40%, then it slows right down
+      function displayFrac(t, dur) {
+        if (!dur || !isFinite(dur)) return 0;
+        if (t <= FAST_DUR) return (t / FAST_DUR) * FAST_TARGET;
+        return FAST_TARGET + ((t - FAST_DUR) / (dur - FAST_DUR)) * (1 - FAST_TARGET);
+      }
+
+      function fmt(t) {
+        if (!isFinite(t)) t = 0;
+        var m = Math.floor(t / 60), s = Math.floor(t % 60);
+        return m + ':' + (s < 10 ? '0' : '') + s;
+      }
+
+      function togglePlay() { video.paused ? video.play() : video.pause(); }
+
+      // Play / pause
+      playBtn.addEventListener('click', togglePlay);
+      overlay.addEventListener('click', togglePlay);
+
+      // Smooth, per-frame progress bar (rAF) instead of choppy timeupdate steps
+      var rafId = null;
+      function renderBar() {
+        if (video.currentTime > maxWatched) maxWatched = video.currentTime;
+        fill.style.width = (displayFrac(video.currentTime, video.duration) * 100) + '%';
+      }
+      function loop() { renderBar(); rafId = requestAnimationFrame(loop); }
+      function startLoop() { if (rafId == null) loop(); }
+      function stopLoop() { if (rafId != null) { cancelAnimationFrame(rafId); rafId = null; } renderBar(); }
+
+      video.addEventListener('play', function () {
+        frame.classList.remove('paused');
+        overlay.style.display = 'none';
+        playIcon.style.display = 'none';
+        pauseIcon.style.display = 'block';
+        startLoop();
+      });
+      video.addEventListener('pause', function () {
+        frame.classList.add('paused');
+        overlay.style.display = 'flex';
+        playIcon.style.display = 'block';
+        pauseIcon.style.display = 'none';
+        stopLoop();
+      });
+      video.addEventListener('ended', stopLoop);
+
+      // Keep furthest-watched accurate even if rAF is throttled (background tab)
+      video.addEventListener('timeupdate', function () {
+        if (video.currentTime > maxWatched) maxWatched = video.currentTime;
+      });
+
+      // BLOCK forward seeking — clamp any jump past what's been watched
+      video.addEventListener('seeking', function () {
+        if (video.currentTime > maxWatched + SEEK_TOLERANCE) {
+          video.currentTime = maxWatched;
+        }
+      });
+
+      // Kill keyboard seek shortcuts while the player is focused
+      frame.addEventListener('keydown', function (e) {
+        var blocked = ['ArrowRight','ArrowLeft','ArrowUp','ArrowDown','PageUp','PageDown','Home','End','l','j','L','J'];
+        if (blocked.indexOf(e.key) !== -1) { e.preventDefault(); e.stopPropagation(); }
+      });
+      // Remove the native context menu (download / loop / controls options)
+      video.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+      // Volume
+      volSlider.addEventListener('input', function () {
+        video.volume = parseFloat(volSlider.value);
+        video.muted = video.volume === 0;
+      });
+      muteBtn.addEventListener('click', function () {
+        video.muted = !video.muted;
+      });
+      video.addEventListener('volumechange', function () {
+        var muted = video.muted || video.volume === 0;
+        volIcon.style.display  = muted ? 'none' : 'block';
+        muteIcon.style.display = muted ? 'block' : 'none';
+        volSlider.value = video.muted ? 0 : video.volume;
+      });
+
+      // Fullscreen (on the whole frame so custom controls stay)
+      fsBtn.addEventListener('click', function () {
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+          (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+        } else {
+          (frame.requestFullscreen || frame.webkitRequestFullscreen).call(frame);
+        }
+      });
+    })();
+
+    // Keep the custom thumbnail as the resting state: show it before play,
+    // and bring it back whenever the clip is paused or finishes.
+    document.querySelectorAll('.faq-video').forEach(function (frame) {
+      var video = frame.querySelector('video');
+      if (!video) return;
+      var posterSrc = video.getAttribute('poster');
+      if (!posterSrc) return;
+
+      var ov = document.createElement('div');
+      ov.className = 'poster-ov';
+      ov.innerHTML =
+        '<img src="' + posterSrc + '" alt="">' +
+        '<span class="mini-play"><svg viewBox="0 0 24 24" fill="none"><path d="M7 5l12 7-12 7V5z" fill="#fff"/></svg></span>';
+      frame.appendChild(ov);
+
+      function showOverlay() { ov.style.display = 'flex'; }
+      function hideOverlay() { ov.style.display = 'none'; }
+
+      ov.addEventListener('click', function () { video.play(); });
+      video.addEventListener('play', hideOverlay);
+      video.addEventListener('pause', showOverlay);
+      video.addEventListener('ended', showOverlay);
+    });
+  </script>
+</body>
+</html>

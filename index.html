@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Leveleads — AI Appointment Booking for Solar Installers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --blue: #1f5bff;
+    --blue-hover: #1247e0;
+    --navy: #050b1c;
+    --text: #ffffff;
+    --muted: #aeb8cc;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body { min-height: 100%; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text);
+    background: var(--navy);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* ---------- Page layout ---------- */
+  .page {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Background image + dark overlay */
+  .page::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(5,11,28,0.78) 0%, rgba(5,11,28,0.70) 35%, rgba(5,11,28,0.85) 70%, rgba(5,11,28,0.97) 100%),
+      url("hero.jpg") center / cover no-repeat;
+    z-index: 0;
+  }
+
+  .content {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    width: 100%;
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 48px 24px 0;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ---------- Logo ---------- */
+  .logo {
+    width: 132px;
+    height: 132px;
+    border-radius: 20px;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+    margin-bottom: 52px;
+    overflow: hidden;
+  }
+  .logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+  /* ---------- Hero copy ---------- */
+  .eyebrow {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    color: #ffffff;
+    margin-bottom: 18px;
+  }
+
+  h1 {
+    font-size: clamp(30px, 5.2vw, 58px);
+    line-height: 1.04;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    max-width: 16ch;
+    margin: 0 auto;
+    text-shadow: 0 2px 24px rgba(0,0,0,0.55);
+  }
+
+  .subtext {
+    margin: 24px auto 0;
+    max-width: 60ch;
+    font-size: clamp(15px, 1.9vw, 19px);
+    line-height: 1.6;
+    color: #d4dbe8;
+    font-weight: 400;
+    text-shadow: 0 1px 14px rgba(0,0,0,0.5);
+  }
+
+  /* ---------- Buttons ---------- */
+  .cta-stack {
+    margin-top: 56px;
+    width: 100%;
+    max-width: 720px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    width: 100%;
+    padding: 26px 28px;
+    border: none;
+    border-radius: 12px;
+    background: var(--blue);
+    color: #fff;
+    font-family: inherit;
+    font-size: clamp(15px, 2.1vw, 21px);
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform .15s ease, background .2s ease, box-shadow .2s ease;
+    box-shadow: 0 16px 40px rgba(31,91,255,0.35);
+  }
+  .btn:hover {
+    background: var(--blue-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 22px 52px rgba(31,91,255,0.45);
+  }
+  .btn:active { transform: translateY(0); }
+
+  .btn .arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+    flex: 0 0 auto;
+  }
+  .btn .arrow svg { width: 14px; height: 14px; }
+
+  /* ---------- Footer ---------- */
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 24px 30px;
+    color: #8b95ab;
+    font-size: 14px;
+  }
+
+  @media (max-width: 600px) {
+    .content { padding-top: 40px; }
+    .logo { margin-bottom: 40px; }
+    .cta-stack { margin-top: 44px; gap: 16px; }
+    .btn { padding: 22px 20px; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <main class="content">
+
+      <!-- Logo -->
+      <div class="logo" aria-label="Leveleads">
+        <img src="logo.png" alt="Leveleads" />
+      </div>
+
+      <!-- Hero -->
+      <p class="eyebrow">IT'S TIME</p>
+      <h1>Do Your Installs While The AI Books Appointments For You</h1>
+      <p class="subtext">
+        Our AI voice agent calls, qualifies and books your solar leads into the
+        calendar — automatically, around the clock. You stay on the roof. It fills
+        your diary.
+      </p>
+
+      <!-- CTAs -->
+      <div class="cta-stack">
+        <a href="implement.html" class="btn">
+          Implement The AI Into Your Business
+          <span class="arrow">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 6l6 6-6 6" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </a>
+
+        <a href="talk-to-ai.html" class="btn">
+          Talk To The AI Yourself
+          <span class="arrow">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 6l6 6-6 6" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </a>
+      </div>
+
+    </main>
+
+    <footer>
+      © 2026 Leveleads — All rights reserved.
+    </footer>
+  </div>
+</body>
+</html>

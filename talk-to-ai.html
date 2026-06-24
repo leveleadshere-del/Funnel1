@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Leveleads — Talk To The AI Yourself</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --blue: #1f5bff;
+    --green: #2fb24a;
+    --green-hover: #279a3e;
+    --navy: #050b1c;
+    --text: #ffffff;
+    --muted: #aeb8cc;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { min-height: 100%; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text);
+    background: var(--navy);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .page {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .page::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(120% 80% at 50% -10%, rgba(31,91,255,0.22) 0%, rgba(5,11,28,0) 55%),
+      radial-gradient(90% 70% at 50% 110%, rgba(47,178,74,0.16) 0%, rgba(5,11,28,0) 55%),
+      linear-gradient(180deg, #081326 0%, #050b1c 60%, #04081a 100%);
+    z-index: 0;
+  }
+
+  .content {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 40px 24px 0;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Back link */
+  .back {
+    align-self: flex-start;
+    color: #8b95ab;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 18px;
+    transition: color .2s ease;
+  }
+  .back:hover { color: #d4dbe8; }
+
+  /* Logo */
+  .logo {
+    width: 116px;
+    height: 116px;
+    border-radius: 20px;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+    margin-bottom: 40px;
+    overflow: hidden;
+  }
+  .logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+  .eyebrow {
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    color: var(--green);
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-size: clamp(28px, 4.6vw, 48px);
+    line-height: 1.08;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    max-width: 17ch;
+    margin: 0 auto;
+  }
+
+  .lead {
+    margin: 22px auto 0;
+    max-width: 56ch;
+    font-size: clamp(15px, 1.9vw, 18px);
+    line-height: 1.65;
+    color: #c6cedd;
+    font-weight: 400;
+  }
+  .lead strong { color: #fff; font-weight: 700; }
+
+  /* Phone + call block */
+  .call-card {
+    margin-top: 40px;
+    width: 100%;
+    max-width: 560px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 20px;
+    padding: 34px 28px;
+    backdrop-filter: blur(6px);
+  }
+
+  .call-label {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #8b95ab;
+    margin-bottom: 12px;
+  }
+
+  .phone {
+    display: inline-block;
+    font-size: clamp(28px, 5vw, 40px);
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    color: #fff;
+    text-decoration: none;
+    margin-bottom: 24px;
+  }
+
+  .call-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    width: 100%;
+    padding: 24px 24px;
+    border: none;
+    border-radius: 14px;
+    background: var(--green);
+    color: #fff;
+    font-family: inherit;
+    font-size: clamp(17px, 2.4vw, 22px);
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform .15s ease, background .2s ease, box-shadow .2s ease;
+    box-shadow: 0 16px 40px rgba(47,178,74,0.35);
+  }
+  .call-btn:hover {
+    background: var(--green-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 22px 52px rgba(47,178,74,0.45);
+  }
+  .call-btn:active { transform: translateY(0); }
+  .call-btn svg { width: 24px; height: 24px; flex: 0 0 auto; }
+
+  .reassure {
+    margin-top: 16px;
+    font-size: 14px;
+    color: #8b95ab;
+    line-height: 1.5;
+  }
+
+  .implement-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    margin-top: 18px;
+    padding: 18px 22px;
+    border: 1px solid var(--blue);
+    border-radius: 14px;
+    background: var(--blue);
+    color: #fff;
+    font-family: inherit;
+    font-size: clamp(14px, 1.9vw, 17px);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .2s ease, border-color .2s ease, transform .15s ease;
+  }
+  .implement-btn:hover {
+    background: #1247e0;
+    border-color: #1247e0;
+    transform: translateY(-2px);
+  }
+  .implement-btn svg { width: 18px; height: 18px; flex: 0 0 auto; }
+
+  /* What to notice */
+  .notice {
+    margin-top: 44px;
+    width: 100%;
+    max-width: 560px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .notice-item {
+    background: #0d1120;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 22px 18px;
+    text-align: left;
+    transition: border-color .2s ease, transform .2s ease;
+  }
+  .notice-item:hover { border-color: rgba(31,91,255,0.45); transform: translateY(-2px); }
+  .notice-item .t { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 5px; }
+  .notice-item .d { font-size: 13px; color: #98a2b6; line-height: 1.5; }
+
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 48px 24px 30px;
+    color: #8b95ab;
+    font-size: 14px;
+  }
+
+  @media (max-width: 600px) {
+    .content { padding-top: 28px; }
+    .logo { margin-bottom: 30px; }
+    .call-card { padding: 28px 20px; margin-top: 32px; }
+    .notice { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <main class="content">
+
+      <a href="index.html" class="back">← Back</a>
+
+      <!-- Logo -->
+      <div class="logo" aria-label="Leveleads">
+        <img src="logo.png" alt="Leveleads" />
+      </div>
+
+      <!-- Hero -->
+      <p class="eyebrow">DON'T TAKE OUR WORD FOR IT</p>
+      <h1>Talk To The AI Yourself — Right Now</h1>
+      <p class="lead">
+        You know the feeling: a lead fills in a form at 8pm while you're still up a
+        ladder. You call back the next morning — and they've already booked with the
+        installer who picked up first. <strong>Our AI answers in seconds, every single
+        time.</strong> Pick up your phone, pretend you're one of your own leads, and
+        have a real conversation with it.
+      </p>
+
+      <!-- Call card -->
+      <div class="call-card">
+        <p class="call-label">Call the AI on</p>
+        <a href="tel:+442475429646" class="phone">+44 24 7542 9646</a>
+
+        <a href="tel:+442475429646" class="call-btn">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6.5 3h3l1.5 4-2 1.5a12 12 0 005 5l1.5-2 4 1.5v3a2 2 0 01-2.2 2A17 17 0 014.5 5.2 2 2 0 016.5 3z"
+                  fill="#fff"/>
+          </svg>
+          Call The AI Now
+        </a>
+
+        <p class="reassure">Available 24/7 · Free to call · It picks up like a real receptionist would</p>
+
+        <a href="implement.html" class="implement-btn">
+          Implement This AI Into Your Business
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 6l6 6-6 6" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- What to notice -->
+      <div class="notice">
+        <div class="notice-item">
+          <div class="t">It answers instantly</div>
+          <div class="d">No ringing out, no voicemail, no missed lead.</div>
+        </div>
+        <div class="notice-item">
+          <div class="t">It qualifies them</div>
+          <div class="d">Asks the right questions so you only see real jobs.</div>
+        </div>
+        <div class="notice-item">
+          <div class="t">It books the slot</div>
+          <div class="d">Drops the appointment straight into your diary.</div>
+        </div>
+      </div>
+
+    </main>
+
+    <footer>
+      © 2026 Leveleads — All rights reserved.
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Leveleads — Implement The AI Into Your Business</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --blue: #1f5bff;
+    --green: #2fb24a;
+    --navy: #050b1c;
+    --text: #ffffff;
+    --muted: #aeb8cc;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { min-height: 100%; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text);
+    background: var(--navy);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .page {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .page::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(110% 70% at 50% -10%, rgba(31,91,255,0.24) 0%, rgba(5,11,28,0) 55%),
+      radial-gradient(90% 60% at 50% 115%, rgba(47,178,74,0.14) 0%, rgba(5,11,28,0) 55%),
+      linear-gradient(180deg, #081326 0%, #050b1c 55%, #04081a 100%);
+    z-index: 0;
+  }
+
+  .content {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    width: 100%;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 40px 24px 0;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .back {
+    align-self: flex-start;
+    color: #8b95ab;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 18px;
+    transition: color .2s ease;
+  }
+  .back:hover { color: #d4dbe8; }
+
+  .logo {
+    width: 108px;
+    height: 108px;
+    border-radius: 20px;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+    margin-bottom: 36px;
+    overflow: hidden;
+  }
+  .logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+  .eyebrow {
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    color: var(--blue);
+    margin-bottom: 16px;
+  }
+  .eyebrow .b { color: #4d83ff; }
+
+  h1 {
+    font-size: clamp(30px, 5vw, 52px);
+    line-height: 1.06;
+    font-weight: 900;
+    letter-spacing: -0.015em;
+    max-width: 18ch;
+    margin: 0 auto;
+  }
+  h1 .hl { color: #4d9bff; }
+
+  .lead {
+    margin: 22px auto 0;
+    max-width: 58ch;
+    font-size: clamp(15px, 1.9vw, 18px);
+    line-height: 1.65;
+    color: #c6cedd;
+    font-weight: 400;
+  }
+  .lead strong { color: #fff; font-weight: 700; }
+
+  /* Value row */
+  .values {
+    margin-top: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px 22px;
+  }
+  .value {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: #d4dbe8;
+  }
+  .value .tick {
+    width: 20px; height: 20px; flex: 0 0 auto;
+    border-radius: 50%;
+    background: rgba(47,178,74,0.16);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .value .tick svg { width: 12px; height: 12px; }
+
+  /* Booking card */
+  .booking-wrap {
+    margin-top: 40px;
+    width: 100%;
+    max-width: 760px;
+  }
+  .booking-head {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #fff;
+  }
+  .booking-head .dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 0 4px rgba(47,178,74,0.18);
+  }
+  .booking-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 10px;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.45);
+    overflow: hidden;
+  }
+  .booking-card iframe {
+    width: 100%;
+    min-height: 720px;
+    border: none;
+    overflow: hidden;
+    display: block;
+    border-radius: 12px;
+  }
+
+  .micro {
+    margin-top: 18px;
+    font-size: 13.5px;
+    color: #8b95ab;
+    line-height: 1.5;
+  }
+
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 46px 24px 30px;
+    color: #8b95ab;
+    font-size: 14px;
+  }
+
+  @media (max-width: 600px) {
+    .content { padding-top: 28px; }
+    .logo { margin-bottom: 28px; }
+    .booking-wrap { margin-top: 30px; }
+    .booking-card iframe { min-height: 640px; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <main class="content">
+
+      <a href="index.html" class="back">← Back</a>
+
+      <!-- Logo -->
+      <div class="logo" aria-label="Leveleads">
+        <img src="logo.png" alt="Leveleads" />
+      </div>
+
+      <!-- Hero copy -->
+      <p class="eyebrow">DONE-FOR-YOU SETUP</p>
+      <h1>Stop Losing Jobs To The Installer Who <span class="hl">Picked Up First</span></h1>
+      <p class="lead">
+        Pick a time below and we'll build your AI voice agent end-to-end — trained on
+        <strong>your</strong> services, <strong>your</strong> pricing and <strong>your</strong> area.
+        It answers every call in seconds, qualifies the lead, and books the job straight
+        into your diary. You stay on the roof. It handles the phone.
+      </p>
+
+      <!-- Value row -->
+      <div class="values">
+        <span class="value">
+          <span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="#3ad05a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          Built &amp; set up for you
+        </span>
+        <span class="value">
+          <span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="#3ad05a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          Answers 24/7, never sick
+        </span>
+        <span class="value">
+          <span class="tick"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="#3ad05a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          No tech skills needed
+        </span>
+      </div>
+
+      <!-- Booking calendar -->
+      <div class="booking-wrap">
+        <div class="booking-head">
+          <span class="dot"></span> Pick Your Free Strategy Call
+        </div>
+        <div class="booking-card">
+          <iframe src="https://api.leadconnectorhq.com/widget/booking/iRwrmXB1vTg86yAalmPJ"
+                  scrolling="no"
+                  id="iRwrmXB1vTg86yAalmPJ_1782162543019"></iframe>
+        </div>
+        <p class="micro">Takes 15 minutes · No pressure, no jargon · Walk away knowing exactly how it'd work for your business</p>
+      </div>
+
+    </main>
+
+    <footer>
+      © 2026 Leveleads — All rights reserved.
+    </footer>
+  </div>
+
+  <script src="https://link.msgsndr.com/js/form_embed.js" type="text/javascript"></script>
+</body>
+</html>
